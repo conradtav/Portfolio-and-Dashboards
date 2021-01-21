@@ -21,6 +21,6 @@ I use a script similar to this one to make creat demographic models based on sur
 
 ## Dashboard Applications
 
-### [Display Changing Oxygen Levels with Shiny](Noteebooks/Shiny Apps/ShinyDashBoard/)
+### [Display Changing Oxygen Levels with Shiny](Shiny Apps/ShinyDashBoard/)
 
-### [Measuring Classification Results with Streamlit](
+### [Measuring Classification Results with Streamlit](Streamlit Apps/)
