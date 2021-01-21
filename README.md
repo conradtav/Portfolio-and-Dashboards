@@ -13,5 +13,6 @@ I use a script similar to this one to make creat demographic models based on sur
 ## [Time Series Vizualization](NoteBooks/Sample_Time_Series.ipynb)
 
 ## Zoom Export and Analysis
- ### [Chart Making] (NoteBooks/Zoom_Poll_ChartMaker.ipynb)
- ### [Text Analysis] (NoteBooks/Zoom_Transcript_Text_Mining.ipynb)
+- [Chart Making](NoteBooks/Zoom_Poll_ChartMaker.ipynb)
+
+- [Text Analysis](NoteBooks/Zoom_Transcript_Text_Mining.ipynb)
