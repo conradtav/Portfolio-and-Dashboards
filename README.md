@@ -20,3 +20,7 @@ I use a script similar to this one to make creat demographic models based on sur
 - [Text Analysis](NoteBooks/Zoom_Transcript_Text_Mining.ipynb)
 
 ## Dashboard Applications
+
+### [Display Changing Oxygen Levels with Shiny](Noteebooks/Shiny Apps/ShinyDashBoard/)
+
+### [Measuring Classification Results with Streamlit](
