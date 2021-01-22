@@ -26,6 +26,6 @@ I use this script to preform basic text mining from raw transcript files exporte
 
 ## Dashboard Applications
 
-### [Display Changing Enviromental Metrics with Shiny](Shiny Apps/ShinyDashBoard/App.R)
+### [Display Changing Enviromental Metrics with Shiny](Shiny_Apps/ShinyDashBoard/App.R)
 
-### [Measuring Classification Results with Streamlit](Streamlit Apps/ML_APP/streamlit-ml/app.py)
+### [Measuring Classification Results with Streamlit](Streamlit_Apps/ML_APP/streamlit-ml/app.py)
