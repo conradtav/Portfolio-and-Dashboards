@@ -1,0 +1,839 @@
+---
+title: "Final"
+author: "Conrad_Tavarez"
+output:
+  pdf_document: default
+---
+# Introduction
+These three data sets all pertain to vaccinations. The first and second datasets are the same for everyone and are mainly included to provide context. Most of the substantive analyses occur with the third dataset. This third dataset is sample of California kindergartens that reported vaccination data.  It includes their reported vaccination rates along with the specific exemptions unvaccinated students were elligible for.
+ 
+
+```{r}
+
+
+load("~/IST 772/Final/reportSample16.RData")
+load("~/IST 772/Final/allSchoolsReportStatus.RData")
+load("~/IST 772/Final/usVaccines.RData")
+```
+
+_allSchoolsReportStatus.RData ??? A list of California kindergartens and whether they reported vaccination data to the state in 2013_
+ 
+$ name    : Name of the school  
+$ pubpriv : ???PUBLIC??? or ???PRIVATE???  
+$ reported: ???Y??? or ???N
+
+```{r}
+summary(allSchoolsReportStatus)
+```
+
+_usVaccines.Rdata ??? Time series data from the World Health Organization reporting vaccination rates in the U.S. for five common vaccines_
+Time-Series [1:38, 1:5] from 1980 to 2017: 
+ - attr(*, "dimnames")=List of 2   ..
+ $ : NULL   ..
+ $ : chr [1:5] "DTP1" "HepB_BD" "Pol3" "Hib3" ???MCV1???...  
+ DTP1 -     First dose of Diphtheria/Pertussis/Tetanus vaccine;
+ HepB_BD -  Hepatitis B, Birth Dose; 
+ Pol3 -     Polio third dose; Hib3 ??? Influenza third dose;
+ Hib3 ???      Influenza third dose;
+ MCV1 -     Measles first dose
+```{r}
+summary(usVaccines)
+```
+
+_reportSampleX.RData ??? (Where X is the number of your particular dataset) A sample of California kindergartens that reported vaccination data, along with specific numbers and percentages for each school in the sample:_
+$ code       : CA School Code Number (included for completeness, can be ignored) 
+$ name       : Name of the school  
+$ pubpriv    : Factor w/ 2 levels "PRIVATE","PUBLIC???  
+$ enrollment : An integer indicating the number of students enrolled at the school  
+$ allvaccs   : The percent of enrolled students who had documented all required vaccinations  
+$ conditional: The percent of enrolled students needed follow-up on their records  
+$ medical    : The percent of enrolled students with a medical exemption  
+$ religious  : The percent of enrolled students with a religious/belief exemption  
+$ dptMiss    : The percent of students missing the Diphtheria/Pertussis/Tetanus vaccine  
+$ polMiss    : The percent of students missing the Polio vaccine   
+$ mmrMiss    : The percent of students missing the Measles/Mumps/Rubella vaccine   
+$ hepMiss    : The percent of students missing the Hepatitis vaccine   
+$ varMiss    : The percent of students missing the Varicella (chickenpox) vaccine
+```{r}
+summary(reportSample)
+```
+
+# Descriptive Reports:
+### 1. The proportion of public schools reported vaccination data 
+```{r}
+# Transformations
+All_Schools <- allSchoolsReportStatus # store in temporary variable for data integrity
+All_Schools$reported <- factor(All_Schools$reported, levels=c("N","Y")) # change from string to factor
+
+All_Schools$reported <- as.integer(All_Schools$reported)-1 # change to int
+
+Public_Schools <- All_Schools[All_Schools$pubpriv == 'PUBLIC',] # seperate public schools
+
+sum(Public_Schools$reported == 1)/nrow(Public_Schools)
+
+# Pie Chart with Percentages
+pct <-round(table(Public_Schools[,2:3])/nrow(Public_Schools),3)*100#
+lgd <-c( 'Unreported', 'Reported')
+lbls <- paste(lgd, "\n",pct,"%",sep="") # ad % to labels
+
+pie(pct,labels = lbls, col=c("darkblue","red"),
+   main="Portion of Unreported Schools")
+
+```
+
+### 2. The proportion of private schools reported vaccination data
+```{r}
+# Dsriptiv plots Box hist
+Private_Schools <- All_Schools[All_Schools$pubpriv == 'PRIVATE',]
+sum(Private_Schools$reported == 1)/nrow(Private_Schools)
+
+# Pie Chart with Percentages
+pct <-round(table(Private_Schools[,2:3])/nrow(Private_Schools),3)*100#
+lgd <-c( 'Unreported', 'Reported')
+lbls <- paste(lgd, "\n",pct,"%",sep="") # ad % to labels
+
+pie(pct,labels = lbls, col=c("darkblue","red"),
+   main="Portion of Unreported Schools")
+
+
+```
+
+### 3. U.S. vaccinations rates over time
+```{r}
+#install.packages("tseries")
+ library(tseries)
+#install.packages("changepoint")
+ library(changepoint)
+# Plot the time series
+US_Vaccines_Rates <- usVaccines
+plot(US_Vaccines_Rates )
+ts.plot(US_Vaccines_Rates)
+
+# Plot the change in 
+Change_US_Vaccines_Rates <- diff(US_Vaccines_Rates )
+plot(Change_US_Vaccines_Rates)
+ts.plot (Change_US_Vaccines_Rates)
+colnames(US_Vaccines_Rates)
+
+```
+
+We can see that US Vaccination rates have not been stable over time. From the 1970s to the mid 90's you see a large amount of variation. Then a quick flattening, with very little change from 1995 - 2005. Then in 2005 small variations appear, with occcaisional large dips and recovery. 
+
+```{r}
+# ADF Tests
+adf.test(na.omit(Change_US_Vaccines_Rates[,'DTP1']))
+adf.test(na.omit(Change_US_Vaccines_Rates[,'HepB_BD']))
+adf.test(na.omit(Change_US_Vaccines_Rates[,'Pol3']))
+adf.test(na.omit(Change_US_Vaccines_Rates[,'Hib3']))
+adf.test(na.omit(Change_US_Vaccines_Rates[,'MCV1']))
+
+# Plot the auto correlations function to see paterns stationary means to pattern
+acf(na.omit(US_Vaccines_Rates[,'DTP1']))
+acf(na.omit(US_Vaccines_Rates[,'HepB_BD']))
+acf(na.omit(US_Vaccines_Rates[,'Pol3']))
+acf(na.omit(US_Vaccines_Rates[,'Hib3']))
+acf(na.omit(US_Vaccines_Rates[,'MCV1']))
+```
+With the adf test we can examine the agumented Dickey-Fuller Test we cannot see confirm that these datasets have stationarity meaning that they do not contain trend or cyclinical components. We can also visulize this analysis with an auto correlation funtion. Here we can see that there does not appear to be any lagged correlations in DTP1, nut some significant seasonal influence in the other vaccines. We can separate this compnent below.
+
+
+### 4. Total U.S. vaccinations rates over time Analysis
+```{r}
+
+# Decompose DTP1
+DTP1 <- US_Vaccines_Rates[,"DTP1"]
+DTP1_dc <- decompose(ts(DTP1, frequency=6))
+plot(DTP1_dc )
+title(main ='DTP1')
+
+# Decompose Hepatitis B
+HepB_BD <- US_Vaccines_Rates[,"HepB_BD"]
+HepB_BD_dc <- decompose(ts(HepB_BD, frequency=6))
+plot(HepB_BD_dc )
+title(main = 'HepB_BD')
+
+# Decompose Polio
+Pol3 <- US_Vaccines_Rates[,"Pol3"]
+Pol3_dc <- decompose(ts(Pol3, frequency=6))
+plot(Pol3_dc)
+title(main = "Pol3")
+
+# Decompose FLu 
+Hib3 <- US_Vaccines_Rates[,"Hib3"]
+Hib3_dc <- decompose(ts(Hib3, frequency=6))
+plot(Hib3_dc)
+title(main = "Hib3")
+
+# Decompose Measles 
+MCV1 <- US_Vaccines_Rates[,"MCV1"]
+MCV1_dc <- decompose(ts(MCV1, frequency=6))
+plot(MCV1_dc)
+title(main = "MCV1")
+
+#Test Correlations of trends
+cor(DTP1, DTP1_dc$random, use = "complete.obs")
+cor(HepB_BD, HepB_BD_dc$random, use = "complete.obs")
+cor(Pol3, Pol3_dc$random, use = "complete.obs")
+cor(Hib3, Hib3_dc$random, use = "complete.obs")
+cor(MCV1, MCV1_dc$random, use = "complete.obs")
+```
+When seperating the data from seasonal patterns we can see some consistent trends across the different vaccines. for both polio and the MCV1 THere is a large amount of variation and a significant drop in vaccination coverage in the first quarter followed by a recovery and steadying.In the MCV1 vaccination we see another slight dig in the last quarter. For the influenza DTP1 and the Hepetitis B we see a quick adoption after introduction. For influenza and DTP1 there is a drop in the mid 2000s, where as the HepB vaccine stays at that introduction level of coverage. 
+Below we have highlighted changes in variation and mean for each. 
+
+#### Change Point Detection
+
+
+
+```{r}
+#Chang point detection
+
+  
+# DTP1
+  # Variance change tests
+  #DTP1 <- na.remove(DTP1)
+  cpt.var(na.omit(DTP1), class = FALSE)['conf.value']
+  DTP1_vcp <- cpt.var(na.omit(DTP1),  method='BinSeg')
+  #plot(DTP1_vcp)
+  cpt.var(na.omit(DTP1), class = FALSE)['conf.value']
+  # Mean change tests
+  cpt.mean(na.omit(DTP1))
+  DTP1_mcp <- cpt.mean(na.omit(DTP1), method='BinSeg')
+  plot(DTP1_mcp)
+  cpt.mean(na.omit(DTP1), class = FALSE)['conf.value']
+```
+
+```{r}
+# Hepatitis B
+  #HepB_BD <- na.remove(HepB_BD)
+  cpt.var(na.omit(HepB_BD))
+  HepB_BD_vcp <- cpt.var(na.omit(HepB_BD), method='BinSeg')
+  #plot(HepB_BD_vcp)
+  cpt.var(na.omit(HepB_BD), class = FALSE)['conf.value']
+  
+  # Mean change tests
+  cpt.mean(na.omit(HepB_BD))
+  HepB_BD_mcp <- cpt.mean(na.omit(HepB_BD), method='BinSeg')
+  plot(HepB_BD_mcp)
+  cpt.mean(na.omit(HepB_BD), class = FALSE)['conf.value']
+```  
+```{r}
+# Polio
+  #DTP1 <- na.remove(Pol3)
+  cpt.var(na.omit(Pol3))
+  Pol3_cp <- cpt.var(na.omit(Pol3), method='BinSeg')
+  plot(Pol3_cp)
+  cpt.var(na.omit(Pol3), class = FALSE)['conf.value']
+  # Mean change tests
+  cpt.mean(na.omit(Pol3))
+  HepB_BD_mcp <- cpt.mean(na.omit(Pol3), method='BinSeg')
+  plot(HepB_BD_mcp)
+  cpts(HepB_BD_mcp)
+  cpt.mean(na.omit(Pol3), class = FALSE)['conf.value']
+```
+
+```{r}
+# Flu
+  #DTP1 <- na.remove(Hib3)
+  cpt.var(na.omit(Hib3))
+  Hib3_BD_vcp <- cpt.var(na.omit(Hib3), method='BinSeg')
+  #plot(Hib3)
+  cpt.var(na.omit(Hib3), class = FALSE)['conf.value']
+  # Mean change tests
+  cpt.mean(na.omit(Hib3))
+  Hib3_BD_mcp <- cpt.mean(na.omit(Hib3), method='BinSeg')
+  #plot(Hib3)
+  cpt.mean(na.omit(Hib3), class = FALSE)['conf.value']
+```
+
+```{r}
+# Decompose Measles 
+  #DTP1 <- na.remove(MCV1)
+  cpt.var(na.omit(MCV1))
+  MCV1_BD_vcp <- cpt.var(na.omit(MCV1), method='BinSeg')
+  plot(MCV1_BD_vcp)
+  cpt.var(na.omit(MCV1), class = FALSE)['conf.value']
+  
+  # Mean change tests
+  cpt.mean(na.omit(MCV1))
+  MCV1_BD_mcp <- cpt.mean(na.omit(MCV1), method='BinSeg')
+  plot(MCV1_BD_mcp)
+  cpt.mean(na.omit(MCV1), class = FALSE)['conf.value']
+  
+```
+By the mid-1980s, seven vaccines were available: diphtheria, tetanus, pertussis, measles,mumps, rubella and polio. Because six of these vaccines were combined into two shots (DTP and MMR), and one, the polio vaccine, was given by mouth, children received five shots by the time they were 2 years old and not more than one shot at a single visit. Measles, mumps, rubella, and varicella would later be combined into the MCV1 vaccine in 1995 widely increasing its coverage from the prior MMR combination
+
+
+The hepatitis B vaccine was licensed in 1981 and recommended for high-risk groups such as healthcare workers, intravenous drug users, homosexual men and people with multiple sexual partners. After the failure to control hepatitis B the recommendation  was changed to immunize all infants in 1991. Following this recommendation, hepatitis B disease was virtually eliminated in children less than 18 years of age in the United States.
+
+
+The polio vaccine, was given by mouth starting in 2000
+
+Additional recommendation for influenza were created in 2002, a new version of intranasal influenza vaccines were intorduced in 2004. It was successful enought that the Intranasal influenza vaccine recommendation was discontinued in 2016. However, in 2018, it was put back onto the recommendation list.
+
+Source: https://www.chop.edu/centers-programs/vaccine-education-center/vaccine-history/developments-by-year
+
+#### Bayesian Change Point Identification
+
+```{r}
+library(grid)
+library(bcp)
+
+# Bayesian Approach
+
+bcpPol3 <- bcp(as.vector(Pol3),  burnin = 1000, mcmc = 10000)
+plot(bcpPol3, main = 'Polio vaccination Coverage')
+
+bcpMCV <- bcp(as.vector(MCV1),  burnin = 1000, mcmc = 10000)
+plot(bcpMCV, main = 'MCV1 vaccination Coverage')
+
+bcpHepB_BD <- bcp(na.omit(as.vector(HepB_BD)),  burnin = 1000, mcmc = 10000)
+plot(bcpHepB_BD, main = 'Hepatitis B vaccination Coverage')
+
+bcpDTP1<- bcp(na.omit(as.vector(DTP1)),  burnin = 1000, mcmc = 10000)
+plot(bcpDTP1, main = 'DTP1 vaccination Coverage')
+
+```
+
+
+
+
+
+# Public vs. Private School Comparisons: 
+### 5. Difference in overall reporting proportions between public and private schools  
+
+#### Chi-Squared Test
+```{r}
+
+# Stacked Bar Plot with Colors and Legend
+counts <- t(as.matrix(table(allSchoolsReportStatus[,2:ncol(allSchoolsReportStatus)])))
+barplot(counts, main="Schools Reporting Vaccination Data",
+  xlab="School Designation", col=c("darkblue","red"),
+  legend = rownames(counts))
+
+# teST the hypothesis of whether the public private designation is independent from the whether they report vaccination data or not. 
+
+table(All_Schools[,2:3])
+totals <- table(All_Schools[,2:3])
+chisq.test(totals)
+
+```
+Using a Chi squared test we can place the totals of all California kindergarterns in a contingency table. With the p-value less than any significance value, we can reject the null hypothesis that the smoking habit is independent of the exercise level of the students.
+
+#### Bayes approach
+```{r}
+library(BayesFactor)
+MCMC_ct <- contingencyTableBF(totals, sampleType = 'poisson', posterior = FALSE, iterations = 10000)
+summary(MCMC_ct)
+```
+With an incredibly small bayes factor we can determine that it is very unlikely these two factors are independent. We can now see that the  
+
+
+### 6. Comparasion of overall vaccination rates (allvaccs) between public and private schools. 
+
+#### Data Exploration and Prep
+```{r}
+# First Looks
+sample <- reportSample
+sample$vaxed <- sample$enrollment * (sample$allvaccs/100)
+sample$medtotal <- sample$enrollment * (sample$medical/100)
+sample$reltotal <- sample$enrollment * (sample$religious/100)
+pub_schools = sample[sample$pubpriv == 'PUBLIC',]
+private_schools = sample[sample$pubpriv == 'PRIVATE',]
+hist(pub_schools$allvaccs)
+hist(private_schools$allvaccs)
+boxplot(allvaccs ~ pubpriv, data = sample, outline = FALSE, notch = TRUE)
+
+#sample <- data.frame(sample$code, sample$name, sample$pubpriv, sample$enrollment, sample$allvaccs, sample$vaxed)
+#colnames(sample) <- c('code', 'name', 'pubpriv', 'enrollment', 'vaxxed')
+
+
+
+```
+
+
+```{r}
+
+# Prep Data
+myData <- data.frame(sample$pubpriv, sample$allvaccs, sample$vaxed, sample$enrollment)
+colnames(myData) <- c('pubpriv' ,'allvaccs', 'vaxed', 'enrollment' )
+library(dplyr)
+library(stats)
+p_data <- group_by(myData, pubpriv) %>%
+  summarise(
+    count = n(),
+    mean = mean(allvaccs, na.rm = TRUE),
+    median = median(allvaccs, na.rm = TRUE),
+    sd = sd(allvaccs, na.rm = TRUE),
+    totalv = sum(vaxed),
+    totale = sum(enrollment)
+  )
+p_data$vaxRate = p_data$totalv/p_data$totale
+head(p_data)
+barplot(vaxRate ~pubpriv, data=p_data, col= 'Dark Blue' )
+```
+```{r}
+#install.packages("waffle")
+ 
+library(waffle)
+
+pv <- c( Private_Vaccinated = p_data$totalv[1],
+         Private_NotVaccinated = (p_data$totale[1] - p_data$totalv[1]),
+         Public_Vaccinated = p_data$totalv[2],
+         Public_NotVaccinated = (p_data$totale[2] - p_data$totalv[2])
+          )
+pv <- round((pv/sum(pv))*100)
+
+waffle(pv, rows = 7, title = "Total Vaccination and School Designation in the Sample")
+
+iron(
+  waffle(c(no = 100*(1-p_data$vaxRate[1]), yes = 100*p_data$vaxRate[1]), rows = 5,
+         colors = c("darkblue","red"), title = "PrivateSchool"),
+  waffle(c(no = 100*(1-p_data$vaxRate[2]), yes = 100*p_data$vaxRate[2]), rows = 5, 
+         colors = c("darkblue","red"), title = "PublicSchool")
+)
+
+
+```
+
+
+#### Anova
+
+
+```{r}
+
+# Compute the analysis of variance
+p_dataov <- aov(allvaccs ~ pubpriv, data = sample)
+# Summary of the analysis
+summary(p_dataov)
+```
+As the p-value is not less than the significance level 0.05, we cannot conclude that there are significant differences between public and private school vaccination based soledly on variation.
+
+```{r}
+# Diagnostics
+# 1. Homogeneity of variances
+plot(p_dataov, 1)
+# 2. Normality
+plot(p_dataov, 2)
+
+# Extract the residuals
+aov_residuals <- residuals(object = p_dataov)
+# Run Shapiro-Wilk test
+shapiro.test(x = aov_residuals) 
+```
+While the Shapiro test can show us that the data is normally ditributed. We can see in the residuals by quantile chart the effect that the skew has. A log transformation or square root may be approriate if this metric is to be used further for analysis.
+
+```{r}
+av_aov_bf <- anovaBF(allvaccs ~ pubpriv, data = sample)
+mcmc_aov_av<- posterior(av_aov_bf, iteration=10000)
+summary(mcmc_aov_av)
+hist(mcmc_aov_av[,"pubpriv-PRIVATE"])
+hist(mcmc_aov_av[,"pubpriv-PUBLIC"])
+boxplot(as.matrix(mcmc_aov_av[,2:3]))
+```
+
+#### 2 sample T Test
+```{r}
+t.test( allvaccs ~ pubpriv, data = sample)
+wilcox.test(allvaccs ~ pubpriv, data = sample)
+```
+In both the 2 sample t-test we still cannot null out the null hypothesis that the difference in mean and variance for these two popultions are different. 
+
+```{r}
+#install.packages('effsize')
+library(effsize)
+cohen.d(sample$allvaccs[sample$pubpriv == 'PUBLIC'], sample$allvaccs[sample$pubpriv == 'PRIVATE'])
+```
+An incredibly small effect size wich crosses 0 suggests again that we cannot conclude there is a significant difference
+### 7. Medical exemptions between public and private schools. 
+```{r}
+# First Looks
+
+hist(sqrt(pub_schools$medical))
+hist(sqrt(private_schools$medical))
+boxplot(medical ~ pubpriv, data = sample)
+
+mp_data <- group_by(sample, pubpriv) %>%
+  summarise(
+    count = n(),
+    mean = mean(medical, na.rm = TRUE),
+    median = median(medical, na.rm = TRUE),
+    sd = sd(medical, na.rm = TRUE),
+    totale = sum(enrollment),
+    totalm = sum(medtotal)
+  )
+    
+barplot(mean ~ pubpriv, data = mp_data, col= 'Dark Blue')
+
+
+```
+
+
+#### Anova
+
+```{r}
+
+# Compute the analysis of variance
+mp_dataov <- aov(medical ~ pubpriv, data = sample)
+# Summary of the analysis
+summary(mp_dataov)
+```
+As the p-value is not less than the significance level 0.05, we cannot conclude that there are significant differences between public and private school vaccination based soledly on variation.
+
+```{r}
+# Diagnostics
+# 1. Homogeneity of variances
+plot(mp_dataov, 1)
+# 2. Normality
+plot(mp_dataov, 2)
+
+# Extract the residuals
+aov_residuals <- residuals(object = mp_dataov)
+# Run Shapiro-Wilk test
+shapiro.test(x = aov_residuals) 
+```
+While the Shapiro test can show us that the data is normally ditributed. We can see in the residuals by quantile chart the effect that the skew has. A log transformation or square root may be approriate if this metric is to be used further for analysis.
+
+```{r}
+# Bayesian Approach
+mp_aov_bf <- anovaBF(medical ~ pubpriv, data = sample)
+mcmc_aov_m <- posterior(mp_aov_bf, iteration=10000)
+summary(mcmc_aov_m)
+hist(mcmc_aov_m[,"pubpriv-PRIVATE"])
+hist(mcmc_aov_m[,"pubpriv-PUBLIC"])
+boxplot(as.matrix(mcmc_aov_m[,2:3]))
+```
+The Bayesian apporoach to Anova concurs with the frequentist approach in suggesting that there is not a difference in the mean population.
+
+#### 2 sample T Test
+```{r}
+t.test(medical ~ pubpriv, data = sample)
+wilcox.test(medical**10 ~ pubpriv, data = sample)
+```
+
+
+```{r}
+#install.packages('effsize')
+library(effsize)
+cohen.d(sample$medical[sample$pubpriv == 'PUBLIC'], sample$medical[sample$pubpriv == 'PRIVATE'])
+```
+An incredibly small effect size wich crosses 0 suggests again that we cannot conclude there is a significant difference
+### 8. Religious/belief exemptions between public and private schools. Are there any credible differences? 
+```{r}
+# First Looks
+
+hist(sqrt(pub_schools$religious))
+hist(sqrt(private_schools$religious))
+boxplot(religious ~ pubpriv, data = sample)
+
+rp_data <- group_by(sample, pubpriv) %>%
+  summarise(
+    count = n(),
+    mean = mean(religious, na.rm = TRUE),
+    median = median(religious, na.rm = TRUE),
+    sd = sd(religious, na.rm = TRUE),
+    totale = sum(enrollment),
+    totalr = sum(reltotal)
+  )
+    
+barplot(totalr/totale ~ pubpriv, data = rp_data, col= 'Dark Blue')
+
+
+```
+```{r}
+
+
+rv <- c( Private_Religious_Exemptions = rp_data$totalr[1],
+         Private_Eligible = (rp_data$totale[1] - rp_data$totalr[1]),
+         Public_Religious_Exemptions  = rp_data$totalr[2],
+         Public_Eligible = (rp_data$totale[2] - rp_data$totalr[2])
+          )
+rv <- round((rv/sum(rv))*200)
+
+waffle(rv, rows = 5, title = "Total Vaccination and School Designation in the Sample")
+
+
+
+iron(
+  waffle(c(Eligible = 100*((rp_data$totale[1]-rp_data$totalr[1])/rp_data$totale[1]),
+           Exempt =  100*(rp_data$totalr[1]/rp_data$totale[1])
+           ), 
+  rows = 5, colors = c("darkblue","red"), title = "PrivateSchool"),
+  
+  waffle(c(Eligible = 100*((rp_data$totale[2]-rp_data$totalr[2])/rp_data$totale[2]),
+           Exempt =  100*(rp_data$totalr[2]/rp_data$totale[2])
+           ),
+         rows = 5, colors = c("darkblue","red"), title = "PublicSchool")
+)
+
+```
+
+#### Anova
+
+```{r}
+
+# Compute the analysis of variance
+rp_dataov <- aov(religious ~ pubpriv, data = sample)
+# Summary of the analysis
+summary(rp_dataov)
+```
+As the p-value is not less than the significance level 0.05, we cannot conclude that there are significant differences between public and private school vaccination based soledly on variation.
+
+```{r}
+# Diagnostics
+# 1. Homogeneity of variances
+plot(rp_dataov, 1)
+# 2. Normality
+plot(rp_dataov, 2)
+
+# Extract the residuals
+aov_residuals <- residuals(object = rp_dataov)
+# Run Shapiro-Wilk test
+shapiro.test(x = aov_residuals) 
+```
+While the Shapiro test can show us that the data is normally ditributed. We can see in the residuals by quantile chart the effect that the skew has. A log transformation or square root may be approriate if this metric is to be used further for analysis.
+
+```{r}
+# Bayesian Approach
+r_aov_bf <- anovaBF(religious ~ pubpriv, data = sample)
+mcmc_aov_r <- posterior(mp_aov_bf, iteration=10000)
+summary(mcmc_aov_r)
+hist(mcmc_aov_r[,"pubpriv-PRIVATE"])
+hist(mcmc_aov_r[,"pubpriv-PUBLIC"])
+boxplot(as.matrix(mcmc_aov_r[,2:3]))
+```
+
+#### 2 sample T Test
+```{r}
+rp_t <- t.test(religious ~ pubpriv, data = sample)
+rp_t
+rp_tw <- wilcox.test(religious ~ pubpriv, data = sample)
+rp_tw
+```
+
+```{r}
+#install.packages('effsize')
+library(effsize)
+cohen.d(sample$medical[sample$pubpriv == 'PUBLIC'], sample$medical[sample$pubpriv == 'PRIVATE'])
+```
+# Predictive Analyses:
+After the following explanation it appears the most important distinction is not just total vaccination rates but the portion of that which is a religious exemption we will test this assumption by trying to make predictions 
+
+### 9. Is it possible to predict whether a school is public or private based on conditional, medical, and religious percentages? If so, what are the specifics? 
+
+#### Data Prep
+```{r}
+m_sample <- reportSample # Put data in into a new variable for integrity
+m_sample$nonvax <- sample$conditional + sample$medical + sample$religious # keep total number of percent of non vax
+m_sample$conditional_t <- sample$conditional
+m_sample$conditional <- sample$conditional /(100 - sample$allvaccs) #Measure the portion of all non coverage classified as each category
+m_sample$medical_t <- sample$medical
+m_sample$medical <- sample$medical/(100 - sample$allvaccs)
+m_sample$not_r <-(100 - sample$allvaccs) - m_sample$religious
+m_sample$rel_t <- sample$religious
+m_sample$religious <- sample$religious/(100 - sample$allvaccs)
+m_sample$uc_religious <-  scale(m_sample$religious - m_sample$conditional)+2
+
+
+m_sample<- m_sample[complete.cases(m_sample),]
+```
+I created a variable to represent the portion of all execeptions then the portion of exception which fall into each category. After observing the correlations below I created a variable that is meant to esetimate the unconditional religious exemptions. Then one that is the total percentage of non relious 
+
+```{r}
+cor(m_sample[,c( 'enrollment', 'allvaccs', 'conditional', 'medical', 'religious')])
+cor(sample[,c( 'enrollment', 'allvaccs', 'conditional', 'medical', 'religious')])
+```
+In the correlations we can see potential interactions we'll try to account for these
+```{r}
+boxplot(uc_religious/conditional ~ pubpriv, data=m_sample, outline = FALSE)
+boxplot(nonvax ~ pubpriv, data=m_sample, outline = FALSE)
+```
+These variables give us a better view of the difference between public and private vaccination practices
+
+
+#### Modeling with Multivariate Logistic Regression
+```{r}
+# Base Model
+summary(glm(formula = pubpriv ~ medical + religious + conditional, data=sample, family=binomial()))
+
+# Modified
+priv_glm <- glm(formula = pubpriv ~ uc_religious/conditional + nonvax, data=m_sample, family=binomial())
+
+summary(priv_glm)
+```
+Our transformations were able to lower the AIC, and increase Null deviance as well as residual diviance
+#### Model Evaluation
+```{r}
+exp(coef(priv_glm))
+exp(confint(priv_glm))
+```
+Here we see that the coeffecitient log odds are all right are still hovering close to 1.  This would indicate that they have very little effect on the models ability to make a prediction. However, the uncoditional religious variable does reach into the high 5s. 
+```{r}
+anova(priv_glm, test = 'Chisq')
+```
+```{r}
+#install.packages("BaylorEdPsych")
+library(BaylorEdPsych)
+PseudoR2(priv_glm)
+```
+```{r}
+
+```
+
+
+```{r}
+library(caret)
+cm <- table(round(predict(priv_glm, type = "response")), as.integer(m_sample$pubpriv)-1)
+confusionMatrix(cm)
+
+```
+With the results it is clear that it is not reasonable to try to predict whether a school is private or public 
+
+#### Bayesian Approach 
+```{r}
+#install.packages("MCMCpack")
+
+library(MCMCpack)
+m_sample$pubpriv_n <- as.integer(m_sample$pubpriv)-1
+bayesLogit <- MCMClogit(formula = pubpriv_n ~ uc_religious/conditional + nonvax, data=m_sample)
+summary(bayesLogit)
+
+# Plot the densities
+par(mar=c(1,1,1,1))
+plot(bayesLogit)
+
+# Plot odds for uc_religious rate
+ucr_logOdds <- as.matrix(bayesLogit[,'uc_religious:conditional'])
+ucr_odds <- apply(ucr_logOdds, 1, exp)
+hist(ucr_odds)
+abline(v=quantile(ucr_odds, c(0.025)),col='red')
+abline(v=quantile(ucr_odds, c(0.975)),col='red')
+
+# Plot odds for nonvax
+nv_logOdds <- as.matrix(bayesLogit[,'nonvax'])
+nv_odds <- apply(nv_logOdds, 1, exp)
+hist(nv_odds)
+abline(v=quantile(nv_odds, c(0.025)),col='red')
+abline(v=quantile(nv_odds, c(0.975)),col='red')
+```
+The Bayesian approach allows us to simulate the regression 10000 times and see the ditributions of each coefficent We can see that each has a non zero mean and the HDI does not intersect zero. When examine the posterior odds we can see that they do not interect with one but it does get incredibly close, illustrating that that these metrics are not independent but probably not sensitive enough to use in order to predict a schools private or public status
+
+### 10. Is it possible to predict conditional percentage, based on the percentages of specific vaccines that are missing? If so, what are the specifics?  
+```{r}
+
+hist(m_sample$conditional_t)
+hist(m_sample$varMiss)
+hist(m_sample$hepMiss)
+hist(m_sample$mmrMiss)
+hist(m_sample$polMiss)
+hist(m_sample$dptMiss)
+
+
+m_sample[complete.cases(m_sample), ]
+
+cor(m_sample[,c('dptMiss', 'polMiss', 'mmrMiss', 'hepMiss', 'varMiss')])
+```
+These are not linear and will need logistic transformation
+
+#### Modeling with Multivariate Linear Regression
+```{r}
+con_lm <- lm(formula = conditional_t ~ dptMiss*varMiss*mmrMiss + polMiss +hepMiss, data = m_sample)
+summary(con_lm)
+summary(residuals(con_lm))
+```
+Great Results
+#### Diagnostics
+```{r}
+plot(con_lm)
+```
+
+```{r}
+
+
+m2_sample <- data.frame(m_sample)
+# Outlier Detection 
+# source: https://www.r-bloggers.com/outlier-detection-with-mahalanobis-distance/
+m_dist <- mahalanobis(m2_sample[,c('dptMiss', 'polMiss', 'mmrMiss', 'hepMiss', 'varMiss')], 
+                      colMeans(m_sample[,c('dptMiss', 'polMiss', 'mmrMiss', 'hepMiss', 'varMiss')]), 
+                      cov(m_sample[,c('dptMiss', 'polMiss', 'mmrMiss', 'hepMiss', 'varMiss')])
+)
+
+m2_sample$m_dist <- round(m_dist, 2)
+
+m2_sample$outlier_maha <- "No"
+m2_sample$outlier_maha[m2_sample$m_dist > 10] <- "Yes"
+
+ggplot(m2_sample, aes(x = polMiss, y = mmrMiss, color = outlier_maha)) +
+      geom_point(size = 5, alpha = 0.6, shape = as.integer(m_sample$pubpriv)+15) +
+      labs(title = " Unconditional Religous vs Non Vaccinatedt",
+           subtitle = "Outlier Detection medical exceptions vs religious exceptions  - Using Mahalanobis Distances",
+           caption = "Source: http://wiki.stat.ucla.edu/socr/index.php/SOCR_Data_Dinov_020108_HeightsWeights") +
+      ylab("Vaccination Exception") + xlab("UC Religious") +
+      scale_y_continuous(breaks = seq(160, 200, 5)) +
+      scale_x_continuous(breaks = seq(35, 80, 5))
+
+m2_sample <- m_sample[m2_sample$outlier_maha == "No",]
+summary(m2_sample)
+```
+```{r}
+con_lm <- lm(formula = conditional_t ~ dptMiss * polMiss * mmrMiss * hepMiss * varMiss, data = m2_sample)
+summary(con_lm)
+summary(residuals(con_lm))
+
+plot(con_lm)
+```
+
+#### Bayesian Approach
+```{r}
+con_MCMC <- lmBF(conditional_t ~ dptMiss + polMiss + mmrMiss + hepMiss + varMiss, data = m_sample, posterior = TRUE, iteration=1000)
+summary(con_MCMC)
+r_list <- (con_MCMC[,"sig2"]/var(m_sample$conditional_t))
+hist(r_list)
+abline(v=quantile(r_list, c(0.025)),col='red')
+abline(v=quantile(r_list, c(0.975)),col='red')
+```
+Though these transformations where able to succesfully influence a more accurate prediction the heterogenuitity of the data made prediction inaccurate. 
+
+### 11. Is it possible to predict medical percentage, based on the percentages of specific vaccines that are missing? If so, what are the specifics?  
+#### Modeling with Multivariate Linear Regression
+```{r}
+med_lm <- lm(formula = medical_t ~ dptMiss + mmrMiss, data = m2_sample)
+summary(med_lm)
+summary(residuals(med_lm))
+
+plot(med_lm)
+```
+
+
+#### Bayesian Approach
+```{r}
+med_MCMC <- lmBF(medical_t ~ dptMiss+ varMiss*mmrMiss + hepMiss, data = m_sample, posterior = TRUE, iteration=1000)
+summary(med_MCMC)
+r_list <- (med_MCMC[,"sig2"]/var(m_sample$medical_t))
+hist(r_list)
+abline(v=quantile(r_list, c(0.025)),col='red')
+abline(v=quantile(r_list, c(0.975)),col='red')
+```
+This is an effective model with a high R squared. The bayes density of Rs shows this as well. 
+
+### 12. Is it possible to predict religious percentage, based on the percentages of specific vaccines that are missing? If so, what are the specifics?  
+```{r}
+rel_lm <- lm(formula = rel_t ~ dptMiss+ varMiss*mmrMiss +hepMiss, data = m_sample)
+summary(rel_lm)
+summary(residuals(rel_lm))
+
+plot(rel_lm)
+```
+
+
+#### Bayesian Approach
+```{r}
+rel_MCMC <- lmBF(rel_t ~  dptMiss+ varMiss*mmrMiss +hepMiss, data = m2_sample, posterior = TRUE, iteration=1000)
+summary(rel_MCMC)
+r_list <- (rel_MCMC[,"sig2"]/var(m2_sample$rel_t))
+hist(r_list)
+abline(v=quantile(r_list, c(0.025)),col='red')
+abline(v=quantile(r_list, c(0.975)),col='red')
+```
+### 13. What???s the big picture, based on all of the foregoing analyses?
+
+We can draw a few key takeaways from this analysis. First, is that private schools are less likely to report their vaccination data than public schools. This means that the data we are looking at is skewed towards public schools. Second, we can see that as vaccination for different diseases has been changed in both recommendations and combination, vaccination rates have had a corresponding increase or decrease. In our sample of schools we are able to see we are more likely to see religious or personal belief exemptions from private schools. There is also a wider degree variability in the private school vaccination set. This causes some non homogenity when modeling is attempted. While we can make some staticically significant predictions for the conditionial exemptions based on the specific vaccinations missing we cannot make them very accurately. The Medical exemptions are in such a tiny portion that it makes there prediction almost impossible. However, religous exxemptions proved highly predictable.  
