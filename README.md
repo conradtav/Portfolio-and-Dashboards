@@ -23,6 +23,6 @@ I use this script to preform basic text mining from raw transcript files exporte
 
 ## Dashboard Applications
 
-### [Display Changing Enviromental Metrics with Shiny](Shiny Apps/ShinyDashBoard/)
+### [Display Changing Enviromental Metrics with Shiny](Shiny Apps/ShinyDashBoard/App.R)
 
 ### [Measuring Classification Results with Streamlit](Streamlit Apps/)
