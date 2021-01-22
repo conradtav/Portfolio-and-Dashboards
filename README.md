@@ -30,7 +30,7 @@ I use this script to preform basic text mining from raw transcript files exporte
 Here I created an easy to use web app that can preform various predictive modeling techniques and evaluate them with zero code. Built with streamlit, the dashboard includes automated exploratory vizualizations, widgets to select a model, and various evaluations methodologies.
 
 ### [Display Changing Enviromental Metrics with Shiny](Shiny_Apps/ShinyDashBoard/App.R)
-This an especially tricky problem that I run into often. This app Display multiple variables and domains on a time series with a single dashboard. It uses Shiny and is written in R.
+This an especially tricky problem that I run into often. This app displays multiple variables and domains on a time series with a single dashboard. It uses Shiny and is written in R.
 
 
 
