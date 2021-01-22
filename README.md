@@ -16,10 +16,11 @@ I use a script similar to this one to make creat demographic models based on sur
 
 ### Zoom Export and Analysis
 - [Survey Vizualization](NoteBooks/Zoom_Poll_ChartMaker.ipynb) 
-Creates vizualizations from raw output of zoom polling data. Enables user to load data as a csv and a export bar charts for ready for distribution.   
+I use this script to create vizualizations from the raw output of zoom polling data. It enables a user to load data as a csv and a export bar charts for ready for distribution.    
 
 - [Text Analysis](NoteBooks/Zoom_Transcript_Text_Mining.ipynb)
-Preforms basic text mining from raw transcript files exported from a zoom meeting.
+I use this script to preform basic text mining from raw transcript files exported from a zoom meeting. This script is focused on very basic data cleaning and formatting with some aggregated metrics. It exports the data into a structure that makes it accesiable for more complex NLP like GPT-2
+
 ## Dashboard Applications
 
 ### [Display Changing Enviromental Metrics with Shiny](Shiny Apps/ShinyDashBoard/)
