@@ -3,24 +3,25 @@ Hello! I can't show you everything I've built at professionally, but I can show 
 
 ## Data Analysis Notebooks
 
+### [E Commerce Data Analysis](NoteBooks/Google_Merch_Analysis.ipynb)
+
+### [Vaccination Public Opinion Analysis](NoteBooks/Twitter_Analysis.ipynb)
+
 ### [Using Gradient Boosting to Augment Polling Results](NoteBooks/Gradient_Boosting_With_Polling_Results.ipynb)
 I use a script similar to this one to make creat demographic models based on survey results. Gradient Boosting allows me to aggregate weak predictors like individual polls and preform a more accurate classification.
 
 ### [Cleaning and Wrangling Messy Data](NoteBooks/LAPD_911_Data_Wrangling.ipynb)
 
-### [Vaccination Public Opinion Analysis](NoteBooks/Twitter_Analysis.ipynb)
-
-### [E Commerce Data Analysis](NoteBooks/Google_Merch_Analysis.ipynb)
-
 ### [Time Series Vizualization](NoteBooks/Sample_Time_Series.ipynb)
 
 ### Zoom Export and Analysis
-- [Chart Making](NoteBooks/Zoom_Poll_ChartMaker.ipynb)
+- [Survey Vizualization](NoteBooks/Zoom_Poll_ChartMaker.ipynb) 
+Creates vizualizations from raw output of zoom polling data. Enables user to load data as a csv and a export bar charts for ready for distribution.   
 
 - [Text Analysis](NoteBooks/Zoom_Transcript_Text_Mining.ipynb)
-
+Preforms basic text mining from raw transcript files exported from a zoom meeting.
 ## Dashboard Applications
 
-### [Display Changing Oxygen Levels with Shiny](Shiny Apps/ShinyDashBoard/)
+### [Display Changing Enviromental Metrics with Shiny](Shiny Apps/ShinyDashBoard/)
 
 ### [Measuring Classification Results with Streamlit](Streamlit Apps/)
