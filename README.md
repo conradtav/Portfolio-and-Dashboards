@@ -16,7 +16,7 @@ I examined California schools vaccine coverage. With this dataset I could use fr
 I use a script similar to this one to make creat demographic models based on survey results. Gradient Boosting allows me to aggregate weak predictors like individual polls and preform a more accurate classification.
 
 ### [Cleaning and Wrangling Messy Data](NoteBooks/LAPD_911_Data_Wrangling.ipynb)
-Here I used a variety of techniques to clean an extremely messy data set of emergency call to the LAPD
+Here I used a variety of techniques to clean an extremely messy data set of emergency call to the LAPD. This a project I'm still working on, with a goal to finding more data on emergency services in Los Angeles. 
 
 ### Zoom Export and Analysis
 - [Survey Vizualization](NoteBooks/Zoom_Poll_ChartMaker.ipynb) 
