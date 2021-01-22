@@ -9,7 +9,7 @@ I used Google’s “Big Query” database to analyze the clickstream data for t
 ### [Vaccination Public Opinion Analysis](NoteBooks/Twitter_Analysis.ipynb)
 My team and I looked at social media data and vaccine preventable disease outbreaks. While we found correlations and significant evidence of a relationship, our model to forecast outbreaks based on social media did not reach a level to be depended on. After our analysis we saw convincing evidence to suggest that social media platforms which took active measure to stop the spread of misinformation and conspiracy theories had an impact on their metrics and would lead to increased vaccination rates.
 
-### [School Vaccination Statistical Analysis with R](School_Vax_Stats/Vax_Analysis.pdf)
+### [Statistical Analysis of School Vaccination with R](School_Vax_Stats/Vax_Analysis.pdf)
 I examined California schools vaccine coverage. With this dataset I could use frequentist technique and Bayesian with a Markov-Chain Monte Carlo simulation to establish that private schools had a significantly higher rates of unvaccinated students. I also used a Bayesian approach to identified periods when rates of exceptions to the vaccine requirement increased or decreased. 
 
 ### [Using Gradient Boosting to Augment Polling Results](NoteBooks/Gradient_Boosting_With_Polling_Results.ipynb)
