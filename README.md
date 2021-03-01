@@ -6,13 +6,12 @@ Hello! I can't show you everything I've built at professionally, but I can show 
 ### [E Commerce Data Analysis](NoteBooks/Google_Merch_Analysis.ipynb)
 I used Google’s “Big Query” database to analyze the clickstream data for the Google Merch Store. 
 
-### [Vaccination Public Opinion Analysis]
-
-#### [Vaccination Analysis](NoteBooks/Vax_Modeling/Code/Project_Report.ipynb)
-#### [Facebook Analysis](NoteBooks/Vax_Modeling/Code/Modeling_Sec1Project_2.ipynb)
-#### [Twitter Analysis](NoteBooks/Twitter_Analysis.ipynb)
-
+### [Vaccination Public Opinion Analysis](NoteBooks/Vax_Modeling)
 My team and I looked at social media data and vaccine preventable disease outbreaks. While we found correlations and significant evidence of a relationship, our model to forecast outbreaks based on social media did not reach a level to be depended on. After our analysis we saw convincing evidence to suggest that social media platforms which took active measure to stop the spread of misinformation and conspiracy theories had an impact on their metrics and would lead to increased vaccination rates.
+- [Vaccination Analysis](NoteBooks/Vax_Modeling/Code/Project_Report.ipynb)
+- [Facebook Analysis](NoteBooks/Vax_Modeling/Code/Modeling_Sec1Project_2.ipynb)
+- [Twitter Analysis](NoteBooks/Twitter_Analysis.ipynb)
+
 
 ### [Statistical Analysis of School Vaccination with R](School_Vax_Stats/Vax_Analysis.pdf)
 I examined California schools vaccine coverage. With this dataset I could use frequentist technique and Bayesian with a Markov-Chain Monte Carlo simulation to establish that private schools had a significantly higher rates of unvaccinated students. I also used a Bayesian approach to identified periods when rates of exceptions to the vaccine requirement increased or decreased. 
