@@ -1,5 +1,5 @@
 # Portfolio
-Hello! I can't show you everything I've built at professionally, but I can show a few snippets of code I've written, as well as, some independent projects.
+Hello! I can't show you everything I've built professionally, but I can show a few snippets of code I've written, as well as, some independent projects.
 
 ## Data Analysis Notebooks
 
