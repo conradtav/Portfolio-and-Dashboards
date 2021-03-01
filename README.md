@@ -6,7 +6,12 @@ Hello! I can't show you everything I've built at professionally, but I can show 
 ### [E Commerce Data Analysis](NoteBooks/Google_Merch_Analysis.ipynb)
 I used Google’s “Big Query” database to analyze the clickstream data for the Google Merch Store. 
 
-### [Vaccination Public Opinion Analysis](NoteBooks/Twitter_Analysis.ipynb)
+### [Vaccination Public Opinion Analysis]
+
+#### [Vaccination Analysis](NoteBooks/Vax_Modeling/Code/Project_Report.ipynb)
+#### [Facebook Analysis](NoteBooks/Vax_Modeling/Code/Modeling_Sec1Project_2.ipynb)
+#### [Twitter Analysis](NoteBooks/Twitter_Analysis.ipynb)
+
 My team and I looked at social media data and vaccine preventable disease outbreaks. While we found correlations and significant evidence of a relationship, our model to forecast outbreaks based on social media did not reach a level to be depended on. After our analysis we saw convincing evidence to suggest that social media platforms which took active measure to stop the spread of misinformation and conspiracy theories had an impact on their metrics and would lead to increased vaccination rates.
 
 ### [Statistical Analysis of School Vaccination with R](School_Vax_Stats/Vax_Analysis.pdf)
